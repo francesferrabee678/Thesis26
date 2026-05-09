@@ -1,0 +1,5 @@
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://download.pytorch.org/whl/cu121
+Collecting torch
+  Downloading https://download-r2.pytorch.org/whl/cu121/torch-2.5.1%2Bcu121-cp39-cp39-linux_x86_64.whl (780.4 MB)
+     ━━━━━━━━━╸                               188.2/780.4 MB 11.6 MB/s eta 0:00:52
