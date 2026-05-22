@@ -53,7 +53,7 @@ def process_one_scene(data_path, out_dir, args):
     scene = join(args.data_root_2d, scene_id)
     img_dirs = sorted(glob(join(scene, 'color/*')), key=lambda x: int(os.path.basename(x)[:-4]))
     num_img = len(img_dirs)
-    device = torch.device('cpu')
+    device = torch.device('cuda')
 
     n_points_cur = n_points
     counter = torch.zeros((n_points_cur, 1), device=device)
@@ -83,17 +83,18 @@ def process_one_scene(data_path, out_dir, args):
         image = Image.open(img_dir).convert('RGB')
         image = transform(image).unsqueeze(0).to('cuda')
 
-        with torch.no_grad():
+        with torch.inference_mode():
             feat_all = evaluator(image, output_hidden_states=True).hidden_states[-2]             
-            feat_2d = feat_all[:, -300:, :] 
+            feat_2d = feat_all[:, 5:, :].view(1, 15, 20, 1024)
 
-        feat_2d = feat_2d.view(1, 15, 20, args.feat_dim).permute(0, 3, 1, 2)
+        feat_2d = torch.nn.functional.layer_norm(feat_2d, (1024,)).permute(0, 3, 1, 2)
+
+        feat_2d = torch.nn.functional.interpolate(feat_2d, size=(240, 320), mode='bicubic', align_corners=False).squeeze(0) 
         
-        feat_2d = torch.nn.functional.interpolate(feat_2d, size=(240, 320), mode='bicubic', align_corners=False).squeeze(0) # 240, 320, 1024
-        feat_2d_3d = feat_2d[:, mapping[:, 1], mapping[:, 2]].permute(1, 0).to(device)
-
-        counter[mask!=0]+= 1
-        sum_features[mask!=0] += feat_2d_3d[mask!=0]
+        feat_2d_3d = feat_2d[:, mapping[:, 1], mapping[:, 2]].permute(1, 0)
+        
+        counter[mask != 0] += 1
+        sum_features[mask != 0] += feat_2d_3d[mask != 0]
 
     counter[counter==0] = 1e-5
     feat_bank = sum_features/counter

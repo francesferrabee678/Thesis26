@@ -32,7 +32,7 @@ def get_args():
     return args
 
 
-def process_one_scene(data_path, out_dir, args,mx,my):
+def process_one_scene(data_path, out_dir, args):
     # short hand
     scene_id = data_path.split('/')[-1].split('_vh')[0]
 
@@ -57,11 +57,9 @@ def process_one_scene(data_path, out_dir, args,mx,my):
     device = torch.device('cuda')
 
     n_points_cur = n_points
-
+    counter = torch.zeros((n_points_cur, 1), device=device)
     sum_features = torch.zeros((n_points_cur, feat_dim), device=device)
-    sum_weights = torch.zeros((n_points_cur, 1), device=device)
-    max_dist = np.sqrt(mx**2 + my**2)
-    
+
     ################ Feature Fusion ###################
     vis_id = torch.zeros((n_points_cur, num_img), dtype=int, device=device)
     for img_id, img_dir in enumerate(tqdm(img_dirs)):
@@ -93,15 +91,12 @@ def process_one_scene(data_path, out_dir, args,mx,my):
         feat_2d = torch.nn.functional.interpolate(feat_2d.unsqueeze(0), size=(240, 320), mode='bicubic', align_corners=False).squeeze(0) # 240, 320, 1024
         feat_2d_3d = feat_2d[:, mapping[:, 1], mapping[:, 2]].permute(1, 0).to(device)
 
-        u, v = mapping[:, 1].float(), mapping[:, 2].float()
-        dist_score = -torch.sqrt((u - mx)**2 + (v - my)**2) / max_dist
-        
-        weights = torch.exp(dist_score / 0.1).unsqueeze(-1) * mask.unsqueeze(-1).float()
+        counter[mask!=0]+= 1
+        sum_features[mask!=0] += feat_2d_3d[mask!=0]
 
-        sum_features+= feat_2d_3d * weights
-        sum_weights += weights
-
-    feat_bank = sum_features / (sum_weights + 1e-6)
+    counter[counter==0] = 1e-5
+    feat_bank = sum_features/counter
+    feat_bank = torch.nn.functional.normalize(feat_bank, dim=1)
     point_ids = torch.unique(vis_id.nonzero(as_tuple=False)[:, 0])
 
     save_fused_feature_with_locs(feat_bank, point_ids, locs_in, n_points, out_dir, scene_id, args)
@@ -184,7 +179,7 @@ def main(args):
             print('skip ', i, data_paths[i])
             continue
 
-        process_one_scene(data_paths[i], out_dir, args,mx,my)
+        process_one_scene(data_paths[i], out_dir, args)
 
 if __name__ == "__main__":
     args = get_args()

@@ -23,7 +23,7 @@ def visualize_pc(render, pcd, pc_feat, out_dir_root, out_dir_name, scene_id):
     render.scene.add_geometry('point cloud', pcd, mtl_points)
     cam_dist = np.linalg.norm(pcd.get_max_bound() - pcd.get_min_bound()) * 0.8
 
-    if scene_id in ['scene0011_00','scene0030_00']:#['scene0031_00', 'scene0031_01']:
+    if scene_id in ['scene0000_00']:#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
         pitch, yaw = 45, 180
     else:
         pitch, yaw = 45, 0
@@ -54,7 +54,7 @@ def visualize_pca(render, pcd, pc_feat, out_dir_root, out_dir_name, scene_id):
     mtl_points.shader = "defaultUnlit"
     mtl_points.point_size = 4
 
-    if scene_id in ['scene0011_00','scene0030_00']:#['scene0031_00', 'scene0031_01']:
+    if scene_id in ['scene0000_00']:#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
         pitch, yaw = 45, 180
     else:
         pitch, yaw = 45, 0
@@ -91,15 +91,15 @@ def main():
     render.scene.scene.enable_sun_light(True)
     render.scene.set_background([1, 1, 1, 1])
 
-    prefix = 'dinov2_trial'
+    prefix = 'dinov2_p2'
 
-    pc_dir =        '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_trial/dinov2_points'
-    feat_dir =      '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_trial/dinov2_features'
+    pc_dir =        '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_p2/dinov2_points'
+    feat_dir =      '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_p2/dinov2_features'
     scan_dir =      '/home/fferrabe/Thesis26/data/scannet_raw/scans'
     out_dir_root =  '/home/fferrabe/Thesis26/data/openscene_format/visualizations/{prefix}/{prefix}_visualization'.format(prefix=prefix)
     os.makedirs(out_dir_root, exist_ok=True)
 
-    scene_ids = ['scene0011_00','scene0030_00']#['scene0031_00', 'scene0045_01']
+    scene_ids = ['scene0000_00','scene0045_01']#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']
     
     for scene_id in scene_ids:
         pc_pos = np.load(os.path.join(pc_dir, scene_id + '.npy'))
