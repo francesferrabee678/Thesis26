@@ -273,6 +273,11 @@ def main(args):
 
 if __name__ == "__main__":
     args = get_args()
+    # FIX: apply hparams manually
+    for h in args.hparams:
+        if '=' in h:
+            k, v = h.split('=')
+            setattr(args, k, v)
     print("Arguments:")
     print(args)
 

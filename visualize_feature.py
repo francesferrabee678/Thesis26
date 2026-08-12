@@ -23,7 +23,7 @@ def visualize_pc(render, pcd, pc_feat, out_dir_root, out_dir_name, scene_id):
     render.scene.add_geometry('point cloud', pcd, mtl_points)
     cam_dist = np.linalg.norm(pcd.get_max_bound() - pcd.get_min_bound()) * 0.8
 
-    if scene_id in ['scene0000_00']:#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
+    if scene_id in ['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
         pitch, yaw = 45, 180
     else:
         pitch, yaw = 45, 0
@@ -54,7 +54,7 @@ def visualize_pca(render, pcd, pc_feat, out_dir_root, out_dir_name, scene_id):
     mtl_points.shader = "defaultUnlit"
     mtl_points.point_size = 4
 
-    if scene_id in ['scene0000_00']:#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
+    if scene_id in ['scene0021_00','scene0011_00','scene0030_00','scene0031_00','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']:
         pitch, yaw = 45, 180
     else:
         pitch, yaw = 45, 0
@@ -91,15 +91,15 @@ def main():
     render.scene.scene.enable_sun_light(True)
     render.scene.set_background([1, 1, 1, 1])
 
-    prefix = 'dinov2_p2'
+    prefix = 'uniscene3d'
 
-    pc_dir =        '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_p2/dinov2_points'
-    feat_dir =      '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/dinov2_p2/dinov2_features'
+    pc_dir =        '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/uniscene3d/uniscene3d_points'
+    feat_dir =      '/home/fferrabe/Thesis26/data/openscene_format/scannet_3d/lexicon3d/uniscene3d/uniscene3d_features'
     scan_dir =      '/home/fferrabe/Thesis26/data/scannet_raw/scans'
     out_dir_root =  '/home/fferrabe/Thesis26/data/openscene_format/visualizations/{prefix}/{prefix}_visualization'.format(prefix=prefix)
     os.makedirs(out_dir_root, exist_ok=True)
 
-    scene_ids = ['scene0000_00','scene0045_01']#['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']
+    scene_ids = ['scene0021_00','scene0011_00','scene0030_00','scene0031_00', 'scene0045_01','scene0004_00','scene0007_00','scene0017_00','scene0027_00','scene0024_00']
     
     for scene_id in scene_ids:
         pc_pos = np.load(os.path.join(pc_dir, scene_id + '.npy'))
@@ -150,12 +150,19 @@ def main():
         pc_with_feature_pca = o3d.geometry.PointCloud()
         pc_with_feature_pca.points = o3d.utility.Vector3dVector(pc_pos_aligned)
         pc_with_feature_pca.colors = o3d.utility.Vector3dVector(pca_feat)
+
+        # --- ADD THIS BLOCK ---
+        # set the color to a uniform solid color (e.g., light grey) to see the base structure of pc_pos
+        pc_base_structure = o3d.geometry.PointCloud()
+        pc_base_structure.points = o3d.utility.Vector3dVector(pc_pos_aligned)
+        pc_base_structure.paint_uniform_color([0.7, 0.7, 0.7]) # RGB values from 0 to 1
+        # ----------------------
         
         visualize_pc(render, pc_scan, pc_feat, out_dir_root, 'rgb_scene', scene_id)
         # visualize_pc(render, pc_with_features_strength, pc_feat, out_dir_root, 'feat_scene_strength', scene_id)
         visualize_pc(render, pc_with_feature_kmeans, pc_feat, out_dir_root, 'feat_scene_kmeans', scene_id)
         visualize_pca(render, pc_with_feature_pca, pca_feat, out_dir_root, 'feat_scene_pca', scene_id)
-
+        visualize_pc(render, pc_base_structure, pc_feat, out_dir_root, 'base_structure_scene', scene_id)
 
 if __name__ == '__main__':
     main()

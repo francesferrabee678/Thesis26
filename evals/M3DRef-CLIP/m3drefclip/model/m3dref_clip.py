@@ -19,9 +19,20 @@ class M3DRefCLIP(pl.LightningModule):
         self.save_hyperparameters()
         self.dataset_name = cfg.data.lang_dataset
 
+        prefix = os.environ.get("LEX3D_PREFIX")
+        if prefix in ("uniscene3d", "ptv3ppt"):
+            self.dims = 512
+        elif prefix in ("dinov2", "dinov3"):
+            self.dims = 1024
+        elif prefix == "concerto":
+            self.dims = 1536
+        else:
+            raise ValueError(f"Unknown prefix: {prefix}")
+
+
         # vision modules
-        input_channel = 3 + 3 * cfg.data.point_features.use_rgb + 3 * cfg.data.point_features.use_normal + \
-                        128 * cfg.data.point_features.use_multiview
+        input_channel = 3+3 * cfg.data.point_features.use_rgb + 3 * cfg.data.point_features.use_normal + \
+                        self.dims * cfg.data.point_features.use_multiview
         self.detector = PointGroup(
             input_channel=input_channel, output_channel=cfg.model.network.detector.output_channel,
             max_proposals=cfg.model.network.max_num_proposals, semantic_class=cfg.data.semantic_class,
@@ -127,6 +138,19 @@ class M3DRefCLIP(pl.LightningModule):
                 output_dict["sentence_features"],
                 output_dict["gt_labels"]
             )
+        # --- DEBUG PRINT 3: LOSS & PROP CORRELATION ---
+        if torch.rand(1).item() < 0.01:
+            print("\n" + "#"*40 + " [DEBUG: LOSSES] " + "#"*40)
+            for k, v in loss_dict.items():
+                print(f"Loss component [{k}]: {v.item():.4f}")
+            
+            # Look at the ground truth mask vs predicted features
+            print(f"Target object mask shape: {data_dict['gt_target_obj_id_mask'].shape} | Positives: {data_dict['gt_target_obj_id_mask'].sum().item()}")
+            print(f"Pred AABB Features Shape: {output_dict['aabb_features'].shape}")
+            if torch.isnan(output_dict['aabb_features']).any():
+                print("WARNING: DETECTED NaNs IN AABB FEATURES")
+            print("#"*100)
+
         return loss_dict
 
     def configure_optimizers(self):
@@ -134,6 +158,26 @@ class M3DRefCLIP(pl.LightningModule):
         return optimizer
 
     def training_step(self, data_dict, idx):
+                # --- DEBUG PRINT 1: DATA MODULE INPUTS ---
+        if idx == 0 or idx % 100 == 0:
+            print("\n" + "="*50 + " [DEBUG: DATA INPUTS] " + "="*50)
+            voxel_feats = data_dict["voxel_features"]
+            print(f"Voxel Features Shape: {voxel_feats.shape}")
+            print(f"Voxel Features Stats -> Min: {voxel_feats.min().item():.4f} | Max: {voxel_feats.max().item():.4f} | Mean: {voxel_feats.mean().item():.4f}")
+            
+            # Let's isolate the DINOv2 portion (assuming it's at the end of the channel dimension)
+            if voxel_feats.shape[-1] >= self.dims:
+                dinov2_part = voxel_feats[:, -self.dims:]
+                geom_part = voxel_feats[:, :-self.dims]
+                print(f"  -> Geometry Channels (XYZ/Norm) Mean Magnitude: {geom_part.abs().mean().item():.4f}")
+                print(f"  -> DINOv2 Channels Mean Magnitude: {dinov2_part.abs().mean().item():.4f}")
+                
+                # Critical Check: Ensure they aren't collapsing to constants/zeros
+                print(f"  -> DINOv2 Channels Unique Values Sample Count: {len(torch.unique(dinov2_part[0]))}")
+            print("="*120)
+
+
+
         output_dict = self(data_dict)
         loss_dict = self._loss(data_dict, output_dict)
 

@@ -1,3 +1,6 @@
+# Note i changed a few lines because main_org did not work with my Python version
+
+
 # Copyright 2021 Zhongyang Zhang
 # Contact: mirakuruyoo@gmai.com
 #
@@ -59,9 +62,13 @@ def main(args):
         args.ckpt_path = load_path
 
     args.callbacks = load_callbacks()
-    trainer = Trainer.from_argparse_args(args, accelerator='gpu', devices=1)
+    trainer = Trainer(
+        accelerator='gpu', 
+        devices=1, 
+        max_epochs=args.max_epochs,
+        callbacks=args.callbacks
+    )
     trainer.fit(model, data_module)
-
 
 
 if __name__ == '__main__':
@@ -106,11 +113,9 @@ if __name__ == '__main__':
     parser.add_argument('--color_range', default=255, type=int)
     parser.add_argument('--aug_prob', default=0.5, type=float)
 
-    # Add pytorch lightning's args to parser as a group.
-    parser = Trainer.add_argparse_args(parser)
 
     # Reset Some Default Trainer Arguments' Default Values
-    parser.set_defaults(max_epochs=20)
+    parser.add_argument('--max_epochs', default=20, type=int)
 
     args = parser.parse_args()
 

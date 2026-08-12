@@ -7,12 +7,12 @@ network:
   max_num_proposals: 80
   use_contrastive_loss: True
   clip_model: ViT-B/32
-  use_2d_feature: True
+  use_2d_feature: False
   use_3d_features: True
 
   detector:
     output_channel: 32
-    use_gt_proposal: False
+    use_gt_proposal: True
 
   object_renderer:
     eye: [[0.86, 0.5, 1], [-0.86, 0.5, 1], [0, -1, 1]]
