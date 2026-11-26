@@ -20,14 +20,14 @@ In order to replicate the findings of this thesis perform the following steps:
 
 6. Clone [Openscene_scripts](https://github.com/pengsongyou/openscene/blob/main/scripts/preprocess/README.md) and run the 3D and 2D preprocessing scripts
 
-7. Run the fussion scripts for each model that can be found here Thesis26/lexicon3d/lexicon3d/fusion_scannet_[model_name].py using the corresponding job Thesis26/lexicon3d/jobs/fusion[model_name].sh
+7. Run the fussion scripts for each model that can be found here Thesis26/lexicon3d/lexicon3d/fusion_scannet_[model_name].py using the corresponding job lexicon3d/jobs/fusion[model_name].sh
 
 8. 
-  - To visualize the representations using PCA you can run Thesis26/lexicon3d/visualize_feature.py changing the model name and the scene numbers inside the script
+  - To visualize the representations using PCA you can run https://github.com/francesferrabee678/Thesis26/lexicon3d/visualize_feature.py changing the model name and the scene numbers inside the script
   
-  - The representational CKA script can be found here: Thesis26/lexicon3d/jobs/cka.py
+  - The representational CKA script can be found here: https://github.com/francesferrabee678/Thesis26/lexicon3d/jobs/cka.py
   
-  - Segmentic segmentation part of this repository can be found here: /home/fferrabe/Thesis26/lexicon3d/evals/segmentation
+  - Segmentic segmentation part of this repository can be found here: https://github.com/francesferrabee678/Thesis26/lexicon3d/evals/segmentation
 and the Visual grounding part can be found here https://github.com/francesferrabee678/Thesis26/blob/main/evals/M3DRef-CLIP/. Read the "ReadMe thesis" files to understand what to do next.
 
 ## Acknowledgements
