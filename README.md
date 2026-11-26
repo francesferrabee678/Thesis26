@@ -8,19 +8,19 @@ Link to full thesis with references: [Probing diverse 3D encoder representations
 
 In order to replicate the findings of this thesis perform the following steps:
 
-1. Set up the conda environment using all the Lexicon3D requirements (see there repository for more details)
+1. Set up the conda environment using all the Lexicon3D [requirements](https://github.com/francesferrabee678/Thesis26/blob/main/requirements.txt)
 
-2. clone the repositories for Uniscene3D,Concerto, dinov3, and dinov2 from there respective repository pages. For Pointcept clone and older version so that the weights from HuggingFace work, the version I cloned is commit 2b247ed555e96eae11710dfde79a3fc16c8c74b3 (HEAD, tag: v1.5.0).
+2. clone the repositories for [Uniscene3D](https://github.com/Yebulabula/UniScene3D),[Concerto](https://github.com/Pointcept/Concerto), [Dinov3](https://github.com/facebookresearch/dinov3), and [Dinov2](https://github.com/facebookresearch/dinov2) from their respective repository pages. For Pointcept the older version has been cloned and added to this repository so that the weights from HuggingFace work. The version I cloned is commit 2b247ed555e96eae11710dfde79a3fc16c8c74b3 (HEAD, tag: v1.5.0).
 
-3. Download the weights for each model from there respective repositories
+3. Download the weights for each model from their respective repositories
 
-4. For each model repository there should be a requirements file for the conda environment, run these as well. You may have to create two different Conda environments,  one of the older models and one for the newer models if there is a clash
+4. For each model's repository there should be a requirements file for the conda environment, run these as well. You may have to create two different Conda environments,  one of the older models and one for the newer models if there is a clash
 
-5. Download ScanNet and ScanRefer, instructions can be found on their repository pages
+5. Download ScanNet and ScanRefer, instructions can be found on their repository pages: [ScanNet](https://github.com/scannet/scannet), [ScanRefer](https://github.com/daveredrum/ScanRefer)
 
-6. Clone Openscene_scripts  and run the 3D and 2D preprocessing scripts
+6. Clone [Openscene_scripts](https://github.com/pengsongyou/openscene/blob/main/scripts/preprocess/README.md) and run the 3D and 2D preprocessing scripts
 
-7. Run the fussion scripts each can be found here Thesis26/lexicon3d/lexicon3d/fusion_scannet_[model_name].py using the job which can be found Thesis26/lexicon3d/jobs/fusion[model_name].sh
+7. Run the fussion scripts for each model that can be found here Thesis26/lexicon3d/lexicon3d/fusion_scannet_[model_name].py using the corresponding job Thesis26/lexicon3d/jobs/fusion[model_name].sh
 
 8. 
   - To visualize the representations using PCA you can run Thesis26/lexicon3d/visualize_feature.py changing the model name and the scene numbers inside the script
@@ -28,7 +28,7 @@ In order to replicate the findings of this thesis perform the following steps:
   - The representational CKA script can be found here: Thesis26/lexicon3d/jobs/cka.py
   
   - Segmentic segmentation part of this repository can be found here: /home/fferrabe/Thesis26/lexicon3d/evals/segmentation
-  There is another ReadMe thesis file to go through it
+and the Visual grounding part can be found here https://github.com/francesferrabee678/Thesis26/blob/main/evals/M3DRef-CLIP/. Read the "ReadMe thesis" files to understand what to do next.
 
 ## Acknowledgements
 This repo is primarily built based on the work of [Lexicon3D](https://github.com/yunzeman/lexicon3d) as well as [M3DRefCLIP](https://github.com/3dlg-hcvc/multi3drefer). 
